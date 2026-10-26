@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STOP - Addiction Recovery & Habit Tracking</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0D0D0E',
+                        darkSurface: '#141416',
+                        darkCard: '#1C1C1F',
+                        darkBorder: '#27272A',
+                        brownAccent: '#8C5A3C',
+                        brownHover: '#A06846',
+                        brownLight: '#D49B6A',
+                        brownGlow: 'rgba(140, 90, 60, 0.25)',
+                        sosRed: '#DC2626',
+                        sosRedHover: '#B91C1C'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    keyframes: {
+                        breathIn: {
+                            '0%': { transform: 'scale(1)', opacity: '0.4' },
+                            '50%': { transform: 'scale(1.4)', opacity: '1' },
+                            '100%': { transform: 'scale(1)', opacity: '0.4' }
+                        },
+                        pulseSlow: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.5 }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-100%)', opacity: 0 },
+                            '100%': { transform: 'translateY(0)', opacity: 1 }
+                        }
+                    },
+                    animation: {
+                        breathing: 'breathIn 8s ease-in-out infinite',
+                        pulseSlow: 'pulseSlow 3s ease-in-out infinite',
+                        slideDown: 'slideDown 0.3s ease-out forwards'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom UI Tweaks & Scrollbar */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #070708;
+            color: #F4F4F5;
+            overflow: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141416;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C5A3C;
+            border-radius: 4px;
+        }
+        .glass-panel {
+            background: rgba(28, 28, 31, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-nav {
+            background: rgba(20, 20, 22, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="h-full flex justify-center items-center p-0 sm:p-4 bg-zinc-950">
+
+    <!-- Mobile Screen Frame Container -->
+    <div class="relative w-full max-w-md h-full sm:h-[880px] bg-darkBg sm:rounded-[40px] shadow-2xl border-0 sm:border border-darkBorder flex flex-col overflow-hidden">
+        
+        <!-- TOP APP HEADER -->
+        <header id="main-header" class="px-5 pt-4 pb-3 flex items-center justify-between border-b border-darkBorder/60 bg-darkSurface/80 backdrop-blur-md z-30">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brownAccent to-brownHover flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-brownGlow">
+                    S
+                </div>
+                <div>
+                    <h1 class="text-sm font-extrabold tracking-wider text-white">STOP <span class="text-brownLight font-normal text-xs">RECOVERY</span></h1>
+                    <span id="header-subtitle" class="text-[10px] text-zinc-400 block -mt-0.5">Freedom & Discipline</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <!-- Notification Bell Button -->
+                <button onclick="triggerTestNotification()" title="Simulate Push Alert" class="w-8 h-8 rounded-full bg-darkCard border border-darkBorder flex items-center justify-center text-zinc-300 hover:text-white hover:border-brownAccent transition text-xs">
+                    <i class="fas fa-bell"></i>
+                </button>
+                
+                <!-- Secret Admin Lock Icon -->
+                <button onclick="openAdminModal()" title="Admin Control Panel" class="w-8 h-8 rounded-full bg-darkCard border border-darkBorder flex items-center justify-center text-zinc-400 hover:text-brownLight hover:border-brownAccent transition text-xs">
+                    <i class="fas fa-shield-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- FLOATING TOP PUSH NOTIFICATION BANNER -->
+        <div id="top-notification-banner" class="hidden absolute top-16 left-3 right-3 z-50 bg-darkCard border border-brownAccent/60 text-white p-3 rounded-2xl shadow-2xl animate-slideDown flex items-start space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-brownAccent/20 text-brownLight flex items-center justify-center flex-shrink-0 text-sm border border-brownAccent/40">
+                <i id="notif-icon" class="fas fa-shield-cat"></i>
+            </div>
+            <div class="flex-1 text-left">
+                <h4 id="notif-title" class="text-xs font-bold text-white">Daily Motivation Reminder</h4>
+                <p id="notif-body" class="text-[11px] text-zinc-300 mt-0.5 leading-snug">Stay strong today! Every urge defeated is a step closer to full mastery.</p>
+            </div>
+            <button onclick="closeNotificationBanner()" class="text-zinc-500 hover:text-white p-1 text-xs">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- MAIN VIEWS CONTAINER -->
+        <main id="app-viewport" class="flex-1 relative overflow-y-auto overflow-x-hidden flex flex-col">
+
+            <!-- ================= VIEW 1: ONBOARDING STEP 1 ================= -->
+            <section id="view-onboarding-1" class="view-screen flex-1 p-6 flex flex-col justify-between">
+                <div class="space-y-6 pt-4">
+                    <div class="w-14 h-14 rounded-2xl bg-brownAccent/20 border border-brownAccent/40 flex items-center justify-center text-brownLight text-2xl mb-2">
+                        <i class="fas fa-[#8C5A3C] fa-user-shield text-brownLight"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-brownLight tracking-widest uppercase">Step 1 of 3</span>
+                        <h2 class="text-2xl font-black text-white mt-1">Begin Your Transformation</h2>
+                        <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Break free from unwanted habits, rebuild dopamine baseline, and reclaim full control over your life.</p>
+                    </div>
+
+                    <div class="space-y-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1.5">What is your name / nickname?</label>
+                            <input type="text" id="onboard-name" placeholder="Enter your name..." class="w-full bg-darkCard border border-darkBorder rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brownAccent transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Clean Days Target Goal</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" onclick="selectTargetDays(30, this)" class="target-day-btn py-3 rounded-xl bg-darkCard border border-brownAccent text-white font-bold text-xs">30 Days</button>
+                                <button type="button" onclick="selectTargetDays(60, this)" class="target-day-btn py-3 rounded-xl bg-darkCard border border-darkBorder text-zinc-400 hover:text-white font-bold text-xs">60 Days</button>
+                                <button type="button" onclick="selectTargetDays(90, this)" class="target-day-btn py-3 rounded-xl bg-darkCard border border-darkBorder text-zinc-400 hover:text-white font-bold text-xs">90 Days</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pb-4">
+                    <button onclick="goToOnboardingStep2()" class="w-full py-3.5 bg-gradient-to-r from-brownAccent to-brownHover text-white font-bold text-sm rounded-xl shadow-lg shadow-brownGlow hover:opacity-95 transition flex items-center justify-center gap-2">
+                        <span>Continue Assessment</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 2: ONBOARDING STEP 2 (ASSESSMENT) ================= -->
+            <section id="view-onboarding-2" class="view-screen hidden flex-1 p-6 flex flex-col justify-between">
+                <div class="space-y-5 pt-4">
+                    <div>
+                        <span class="text-xs font-bold text-brownLight tracking-widest uppercase">Step 2 of 3</span>
+                        <h2 class="text-xl font-black text-white mt-1">Triggers Assessment</h2>
+                        <p class="text-xs text-zinc-400 mt-1">Help us customize your AI Coach & protection system.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-xs font-semibold text-zinc-300">What is your primary relapse trigger?</label>
+                        <div class="space-y-2" id="triggers-list">
+                            <button type="button" onclick="selectTrigger('Boredom & Free Time', this)" class="trigger-btn w-full p-3 rounded-xl bg-darkCard border border-brownAccent text-left text-xs text-white font-medium flex items-center justify-between">
+                                <span><i class="fas fa-[#8C5A3C] fa-clock text-brownLight mr-2"></i> Boredom & Late Night Hours</span>
+                                <i class="fas fa-check-circle text-brownLight"></i>
+                            </button>
+                            <button type="button" onclick="selectTrigger('Stress & Anxiety', this)" class="trigger-btn w-full p-3 rounded-xl bg-darkCard border border-darkBorder text-left text-xs text-zinc-300 font-medium flex items-center justify-between">
+                                <span><i class="fas fa-[#8C5A3C] fa-brain text-zinc-500 mr-2"></i> High Stress & Anxiety</span>
+                                <i class="fas fa-circle text-zinc-600"></i>
+                            </button>
+                            <button type="button" onclick="selectTrigger('Social Media & Apps', this)" class="trigger-btn w-full p-3 rounded-xl bg-darkCard border border-darkBorder text-left text-xs text-zinc-300 font-medium flex items-center justify-between">
+                                <span><i class="fas fa-[#8C5A3C] fa-mobile-alt text-zinc-500 mr-2"></i> Unrestricted Phone / Social Media</span>
+                                <i class="fas fa-circle text-zinc-600"></i>
+                            </button>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Why are you taking back control now?</label>
+                            <textarea id="onboard-motivation" rows="2" placeholder="E.g., Better mental clarity, energy, self-respect..." class="w-full bg-darkCard border border-darkBorder rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brownAccent transition"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pb-4 flex items-center gap-3">
+                    <button onclick="showView('view-onboarding-1')" class="py-3.5 px-4 bg-darkCard border border-darkBorder text-zinc-300 text-xs font-bold rounded-xl hover:text-white">Back</button>
+                    <button onclick="startVerificationLoader()" class="flex-1 py-3.5 bg-gradient-to-r from-brownAccent to-brownHover text-white font-bold text-sm rounded-xl shadow-lg shadow-brownGlow hover:opacity-95 transition flex items-center justify-center gap-2">
+                        <span>Analyze & Generate Plan</span>
+                        <i class="fas fa-shield-alt text-xs"></i>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 3: VERIFICATION LOADING SCREEN (0-100%) ================= -->
+            <section id="view-loading" class="view-screen hidden flex-1 p-6 flex flex-col items-center justify-center text-center">
+                <div class="relative w-32 h-32 flex items-center justify-center mb-6">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" class="text-darkCard" fill="transparent" />
+                        <circle id="loader-circle" cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" class="text-brownAccent transition-all duration-300" fill="transparent" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" />
+                    </svg>
+                    <div class="absolute flex flex-col items-center justify-center">
+                        <span id="loader-percentage" class="text-2xl font-black text-white font-mono">0%</span>
+                    </div>
+                </div>
+
+                <h3 id="loader-status-title" class="text-lg font-extrabold text-white">Analyzing Recovery Profile...</h3>
+                <p id="loader-status-sub" class="text-xs text-zinc-400 mt-1 max-w-xs leading-relaxed">Configuring personalized Gemini AI rules and habit blockers...</p>
+                
+                <div class="mt-8 flex items-center gap-2 px-4 py-2 rounded-full bg-darkCard border border-darkBorder text-[11px] text-brownLight">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Verifying user registration info...</span>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 4: PAYMENT LOCK SCREEN (PROMO 24H) ================= -->
+            <section id="view-payment" class="view-screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+                
+                <!-- PROMO COUNTDOWN HEADER CARD -->
+                <div class="bg-gradient-to-r from-zinc-900 via-darkCard to-zinc-900 border border-brownAccent/40 p-4 rounded-2xl relative overflow-hidden shadow-xl">
+                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-brownAccent/20 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-brownAccent/20 border border-brownAccent/40 text-brownLight text-[10px] font-bold uppercase tracking-wider">
+                            ⚡ Limited 24H Promo Offer
+                        </span>
+                        <div class="flex items-center space-x-1 text-xs font-mono font-bold text-amber-400">
+                            <i class="fas fa-clock text-[10px]"></i>
+                            <span id="promo-timer">23:59:54</span>
+                        </div>
+                    </div>
+
+                    <h3 class="text-base font-extrabold text-white">Unlock Full Recovery Lifetime Pass</h3>
+                    <p class="text-[11px] text-zinc-400 mt-0.5">Strict verification required to activate AI Coach & Anti-relapse protections.</p>
+                    
+                    <div class="mt-3 flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-white">50 <span class="text-xs font-bold text-brownLight">TND</span></span>
+                        <span class="text-xs text-zinc-500 line-through font-mono">100 TND</span>
+                        <span class="ml-auto text-[10px] bg-emerald-950 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-800">SAVE 50%</span>
+                    </div>
+                </div>
+
+                <!-- PAYMENT METHODS SELECTOR -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Choose Payment Method</h4>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="switchPaymentTab('ba9chich')" id="tab-btn-ba9chich" class="py-2.5 bg-brownAccent text-white font-bold text-xs rounded-xl border border-brownAccent transition flex items-center justify-center gap-1.5 shadow">
+                            <i class="fas fa-globe text-xs"></i> Ba9chich Pay
+                        </button>
+                        <button onclick="switchPaymentTab('d17')" id="tab-btn-d17" class="py-2.5 bg-darkCard text-zinc-400 font-bold text-xs rounded-xl border border-darkBorder hover:text-white transition flex items-center justify-center gap-1.5">
+                            <i class="fas fa-credit-card text-xs"></i> D17 Direct
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: BA9CHICH PAYMENT -->
+                    <div id="tab-ba9chich" class="payment-tab bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h5 class="text-xs font-bold text-white">Ba9chich Online Gateway</h5>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">Click link below to pay 50 TND securely online.</p>
+                            </div>
+                            <span class="text-xs text-brownLight"><i class="fas fa-external-link-alt"></i></span>
+                        </div>
+                        <a href="https://ba9chich.com/fr/EcommerceTunisia" target="_blank" class="block w-full text-center py-2.5 bg-zinc-900 border border-brownAccent/60 hover:bg-brownAccent hover:text-white text-brownLight font-bold text-xs rounded-xl transition">
+                            Open Ba9chich Portal (https://ba9chich.com)
+                        </a>
+                    </div>
+
+                    <!-- TAB 2: D17 PAYMENT -->
+                    <div id="tab-d17" class="payment-tab hidden bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h5 class="text-xs font-bold text-white">D17 Postcard Transfer</h5>
+                                <p class="text-[11px] text-zinc-400 mt-0.5">Send exactly 50 TND to D17 Card Number below:</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between bg-zinc-950 border border-darkBorder p-3 rounded-xl font-mono">
+                            <span class="text-sm font-bold text-amber-400 tracking-wider">90272020</span>
+                            <button onclick="copyD17Card()" class="px-2.5 py-1 bg-brownAccent/20 hover:bg-brownAccent text-brownLight hover:text-white rounded-lg text-xs font-sans transition">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROOF UPLOADER FORM -->
+                <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-3">
+                    <h4 class="text-xs font-bold text-white flex items-center justify-between">
+                        <span>Upload Payment Receipt / Proof</span>
+                        <span class="text-[10px] text-brownLight font-normal">PNG, JPG, or PDF</span>
+                    </h4>
+
+                    <div class="relative">
+                        <input type="file" id="input-payment-proof" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,.pdf" onchange="previewProofFile(this)" class="hidden">
+                        <label for="input-payment-proof" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-darkBorder hover:border-brownAccent rounded-xl bg-zinc-950/60 cursor-pointer transition text-center">
+                            <i class="fas fa-cloud-upload-alt text-xl text-brownLight mb-1"></i>
+                            <span id="proof-file-label" class="text-xs text-zinc-300 font-medium">Click to select receipt file (Image / PDF)</span>
+                            <span class="text-[10px] text-zinc-500 mt-0.5">Required for Admin manual verification</span>
+                        </label>
+                    </div>
+
+                    <div id="proof-preview-container" class="hidden p-2 bg-zinc-950 border border-darkBorder rounded-xl flex items-center justify-between">
+                        <div class="flex items-center space-x-2 overflow-hidden">
+                            <i class="fas fa-file-invoice text-brownLight text-sm"></i>
+                            <span id="proof-preview-name" class="text-xs text-zinc-300 truncate max-w-[200px]">receipt.pdf</span>
+                        </div>
+                        <button onclick="clearProofFile()" class="text-red-400 text-xs hover:text-red-300 p-1"><i class="fas fa-trash"></i></button>
+                    </div>
+
+                    <button onclick="submitPaymentProof()" id="btn-submit-payment" class="w-full py-3 bg-gradient-to-r from-brownAccent to-brownHover text-white font-bold text-xs rounded-xl shadow-lg shadow-brownGlow hover:opacity-95 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane text-xs"></i>
+                        <span>Send Payment Proof to Admin</span>
+                    </button>
+                </div>
+
+                <!-- STATUS VERIFICATION WAITING BOX -->
+                <div id="payment-status-box" class="hidden p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs space-y-2">
+                    <div class="flex items-center space-x-2 font-bold">
+                        <i class="fas fa-hourglass-half fa-spin text-amber-400"></i>
+                        <span>Verification In Progress...</span>
+                    </div>
+                    <p class="text-[11px] text-zinc-300 leading-relaxed">Your payment proof has been submitted to the Admin via Supabase real-time database. Once confirmed by Admin, your app will automatically unlock!</p>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 5: DASHBOARD (MAIN HOME) ================= -->
+            <section id="view-dashboard" class="view-screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+                
+                <!-- STREAK TICKER HERO CARD -->
+                <div class="bg-gradient-to-br from-darkCard via-zinc-900 to-darkCard border border-darkBorder p-5 rounded-3xl relative overflow-hidden shadow-2xl text-center">
+                    <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-brownAccent/15 rounded-full blur-2xl"></div>
+                    
+                    <span class="inline-block px-3 py-1 rounded-full bg-brownAccent/20 border border-brownAccent/40 text-brownLight text-[10px] font-bold tracking-widest uppercase mb-3">
+                        Clean Days Streak
+                    </span>
+
+                    <div class="grid grid-cols-4 gap-2 my-2 font-mono">
+                        <div class="bg-zinc-950/80 border border-darkBorder p-2.5 rounded-2xl">
+                            <span id="streak-days" class="text-2xl font-black text-white block">00</span>
+                            <span class="text-[9px] text-zinc-500 font-sans uppercase">Days</span>
+                        </div>
+                        <div class="bg-zinc-950/80 border border-darkBorder p-2.5 rounded-2xl">
+                            <span id="streak-hours" class="text-2xl font-black text-brownLight block">00</span>
+                            <span class="text-[9px] text-zinc-500 font-sans uppercase">Hours</span>
+                        </div>
+                        <div class="bg-zinc-950/80 border border-darkBorder p-2.5 rounded-2xl">
+                            <span id="streak-mins" class="text-2xl font-black text-white block">00</span>
+                            <span class="text-[9px] text-zinc-500 font-sans uppercase">Mins</span>
+                        </div>
+                        <div class="bg-zinc-950/80 border border-darkBorder p-2.5 rounded-2xl">
+                            <span id="streak-secs" class="text-2xl font-black text-brownLight block">00</span>
+                            <span class="text-[9px] text-zinc-500 font-sans uppercase">Secs</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar to Goal -->
+                    <div class="mt-4 space-y-1.5">
+                        <div class="flex justify-between text-[11px] font-medium text-zinc-400">
+                            <span>Target Goal: <span id="dash-target-days" class="text-white font-bold">30</span> Days</span>
+                            <span id="dash-progress-percent" class="text-brownLight font-bold">0%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-zinc-950 rounded-full overflow-hidden border border-darkBorder p-0.5">
+                            <div id="dash-progress-bar" class="h-full bg-gradient-to-r from-brownAccent to-brownLight rounded-full transition-all duration-500" style="width: 2%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DAILY MOTIVATION QUOTE -->
+                <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-xl bg-brownAccent/20 text-brownLight flex items-center justify-center flex-shrink-0 text-sm">
+                        <i class="fas fa-quote-left"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-white">Daily Stoic Reinforcement</h4>
+                        <p id="daily-quote-text" class="text-[11px] text-zinc-400 mt-0.5 leading-relaxed italic">"He who conquers himself is mightier than he who conquers a city."</p>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS GRID -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="switchBottomTab('sos')" class="p-4 rounded-2xl bg-red-950/30 border border-red-900/50 hover:bg-red-950/50 transition text-left space-y-2 group">
+                        <div class="w-9 h-9 rounded-xl bg-red-900/40 text-red-400 flex items-center justify-center text-sm border border-red-800">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-red-200">SOS Urge Reliever</h4>
+                            <p class="text-[10px] text-red-400/80">Immediate Panic Reset</p>
+                        </div>
+                    </button>
+
+                    <button onclick="switchBottomTab('coach')" class="p-4 rounded-2xl bg-darkCard border border-darkBorder hover:border-brownAccent transition text-left space-y-2 group">
+                        <div class="w-9 h-9 rounded-xl bg-brownAccent/20 text-brownLight flex items-center justify-center text-sm border border-brownAccent/30">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">AI Gemini Coach</h4>
+                            <p class="text-[10px] text-zinc-400">Live Recovery Chat</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- RELAPSE RESET BUTTON -->
+                <div class="pt-2">
+                    <button onclick="confirmResetStreak()" class="w-full py-2.5 bg-zinc-950 border border-darkBorder hover:border-red-900 text-zinc-400 hover:text-red-400 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5">
+                        <i class="fas fa-undo-alt text-[10px]"></i>
+                        <span>Reset Counter (I Had a Relapse)</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 6: GEMINI AI COACH ================= -->
+            <section id="view-coach" class="view-screen hidden flex-1 flex flex-col h-full bg-darkBg">
+                <!-- AI Header -->
+                <div class="p-3.5 bg-darkSurface border-b border-darkBorder flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-brownAccent/20 border border-brownAccent/40 flex items-center justify-center text-brownLight text-xs font-bold">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                STOP Gemini AI Coach
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </h3>
+                            <span class="text-[10px] text-zinc-400">Trained Recovery Assistant</span>
+                        </div>
+                    </div>
+                    <button onclick="clearChatHistory()" class="text-[11px] text-zinc-500 hover:text-zinc-300">Clear</button>
+                </div>
+
+                <!-- Chat Messages Scroll Area -->
+                <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3">
+                    <!-- Welcome AI Message -->
+                    <div class="flex items-start space-x-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-brownAccent/20 text-brownLight flex items-center justify-center text-xs flex-shrink-0 mt-0.5 border border-brownAccent/30">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="bg-darkCard border border-darkBorder p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs text-zinc-200 leading-relaxed space-y-1">
+                            <p class="font-semibold text-brownLight">Hello! I am your STOP Recovery Assistant.</p>
+                            <p>I am here 24/7 to help you withstand severe urges, reframe cravings, and keep your streak strong. How are you feeling right now?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Prompts Chips -->
+                <div class="px-3 py-2 bg-darkSurface border-t border-darkBorder flex gap-2 overflow-x-auto whitespace-nowrap text-[11px]">
+                    <button onclick="sendQuickPrompt('I have a strong urge right now, help me!')" class="px-3 py-1 bg-red-950/60 border border-red-800 text-red-300 rounded-full hover:bg-red-900 transition flex-shrink-0">
+                        🚨 Emergency Urge Help
+                    </button>
+                    <button onclick="sendQuickPrompt('Give me a 3-minute distraction exercise')" class="px-3 py-1 bg-darkCard border border-darkBorder text-zinc-300 rounded-full hover:border-brownAccent transition flex-shrink-0">
+                        ⚡ Quick Distraction
+                    </button>
+                    <button onclick="sendQuickPrompt('Why is porn and addiction harmful to dopamine?')" class="px-3 py-1 bg-darkCard border border-darkBorder text-zinc-300 rounded-full hover:border-brownAccent transition flex-shrink-0">
+                        🧠 Dopamine Science
+                    </button>
+                </div>
+
+                <!-- Chat Input Box -->
+                <div class="p-3 bg-darkSurface border-t border-darkBorder flex items-center space-x-2">
+                    <input type="text" id="chat-input" placeholder="Ask AI Coach anything..." onkeypress="handleChatKeyPress(event)" class="flex-1 bg-darkCard border border-darkBorder rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-brownAccent transition">
+                    <button onclick="sendChatMessage()" class="w-9 h-9 rounded-xl bg-brownAccent hover:bg-brownHover text-white flex items-center justify-center transition flex-shrink-0 text-xs">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 7: SOS URGE EMERGENCY ================= -->
+            <section id="view-sos" class="view-screen hidden flex-1 p-5 overflow-y-auto space-y-4 bg-gradient-to-b from-darkBg via-red-950/20 to-darkBg">
+                <div class="text-center space-y-1 pt-2">
+                    <span class="px-3 py-0.5 rounded-full bg-red-950 border border-red-800 text-red-400 text-[10px] font-bold uppercase tracking-wider">
+                        SOS Emergency Relief
+                    </span>
+                    <h3 class="text-xl font-black text-white">Breathe Through The Urge</h3>
+                    <p class="text-xs text-zinc-400">Urges last only 10 to 15 minutes. Ride the wave.</p>
+                </div>
+
+                <!-- 4-7-8 Breathing Circle Animation -->
+                <div class="flex flex-col items-center justify-center py-6">
+                    <div class="relative w-44 h-44 flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full bg-red-600/10 border border-red-600/30 animate-breathing"></div>
+                        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-brownAccent to-red-900 border border-brownLight/40 shadow-2xl flex flex-col items-center justify-center text-center p-2 z-10">
+                            <span id="breath-phase" class="text-xs font-black text-white uppercase tracking-wider">Inhale</span>
+                            <span id="breath-timer" class="text-2xl font-black text-white font-mono my-0.5">4s</span>
+                            <span class="text-[9px] text-zinc-300">Deep Belly Breath</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actionable Urge Defeaters -->
+                <div class="space-y-2.5">
+                    <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Instant Reset Protocol</h4>
+                    
+                    <div class="bg-darkCard border border-darkBorder p-3 rounded-2xl flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-xl bg-blue-950 text-blue-400 flex items-center justify-center text-sm flex-shrink-0 border border-blue-800">
+                            <i class="fas fa-shower"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-xs font-bold text-white">Cold Splash / Shower</h5>
+                            <p class="text-[11px] text-zinc-400">Splash freezing water on your face immediately to trigger mammalian dive reflex.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-darkCard border border-darkBorder p-3 rounded-2xl flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-xl bg-amber-950 text-amber-400 flex items-center justify-center text-sm flex-shrink-0 border border-amber-800">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-xs font-bold text-white">20 Fast Pushups</h5>
+                            <p class="text-[11px] text-zinc-400">Divert blood flow directly from brain's urge center to physical muscle tissue.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 8: BLOCKSITE SIMULATION ================= -->
+            <section id="view-blocksite" class="view-screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+                <div>
+                    <h3 class="text-lg font-black text-white">Anti-Relapse Domain Blocker</h3>
+                    <p class="text-xs text-zinc-400">Add explicit or distracting websites to block them instantly.</p>
+                </div>
+
+                <!-- Domain Add Input -->
+                <div class="bg-darkCard border border-darkBorder p-3 rounded-2xl space-y-2">
+                    <label class="block text-xs font-semibold text-zinc-300">Add Site URL to Blacklist</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="input-block-url" placeholder="e.g. adult-site.com" class="flex-1 bg-zinc-950 border border-darkBorder rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brownAccent">
+                        <button onclick="addBlockedDomain()" class="px-4 py-2 bg-brownAccent hover:bg-brownHover text-white font-bold text-xs rounded-xl transition">
+                            Add Block
+                        </button>
+                    </div>
+                </div>
+
+                <!-- In-App Browser & Tester Simulator -->
+                <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-3">
+                    <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                        <i class="fas fa-globe text-brownLight"></i> Test In-App Browser Filter
+                    </h4>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="browser-url-bar" value="pornhub.com" placeholder="Type website URL..." class="flex-1 bg-zinc-950 border border-darkBorder rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none">
+                        <button onclick="simulateNavigateURL()" class="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl transition">
+                            Go
+                        </button>
+                    </div>
+
+                    <!-- Simulated Web Screen Display -->
+                    <div id="browser-viewport" class="w-full h-44 bg-zinc-950 border border-darkBorder rounded-xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        <span class="text-xs text-zinc-500 font-mono">Simulated Browser Viewport</span>
+                    </div>
+                </div>
+
+                <!-- Active Blacklist List -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Active Blacklisted Domains</h4>
+                    <div id="blocked-domains-list" class="space-y-1.5">
+                        <!-- Dynamic list populated via JS -->
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 9: EXPLORE & SCIENCE ================= -->
+            <section id="view-explore" class="view-screen hidden flex-1 p-5 overflow-y-auto space-y-4">
+                <div>
+                    <h3 class="text-lg font-black text-white">Recovery Knowledge Base</h3>
+                    <p class="text-xs text-zinc-400">Articles, science, and community strategies to beat addiction.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-2 hover:border-brownAccent transition">
+                        <span class="text-[10px] font-bold text-brownLight uppercase tracking-wider">Neuroscience</span>
+                        <h4 class="text-xs font-extrabold text-white">How Dopamine Receptors Heal (Timeline)</h4>
+                        <p class="text-[11px] text-zinc-400 leading-relaxed">After 30 days of abstinence, androgen receptors density upregulates, boosting confidence, focus, and energy naturally.</p>
+                    </div>
+
+                    <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-2 hover:border-brownAccent transition">
+                        <span class="text-[10px] font-bold text-brownLight uppercase tracking-wider">Mindset Shift</span>
+                        <h4 class="text-xs font-extrabold text-white">Urge Surfing Method explained</h4>
+                        <p class="text-[11px] text-zinc-400 leading-relaxed">Instead of fighting the craving, observe it like a wave in the ocean. It rises, peaks, and naturally dissipates.</p>
+                    </div>
+
+                    <div class="bg-darkCard border border-darkBorder p-4 rounded-2xl space-y-2 hover:border-brownAccent transition">
+                        <span class="text-[10px] font-bold text-brownLight uppercase tracking-wider">Habit Replacement</span>
+                        <h4 class="text-xs font-extrabold text-white">Replacing High-Dopamine Traps with Growth</h4>
+                        <p class="text-[11px] text-zinc-400 leading-relaxed">Cold showers, heavy lifting, reading, and martial arts provide sustainable serotonin and dopamine without brain fog.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================= VIEW 10: HIDDEN ADMIN CONTROL PANEL ================= -->
+            <section id="view-admin" class="view-screen hidden flex-1 p-4 bg-zinc-950 overflow-y-auto space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+                    <div>
+                        <h3 class="font-black text-white text-base">STOP Admin Control Panel</h3>
+                        <span class="text-[10px] text-brownLight font-mono">Supabase Real-time Payment Sync</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="fetchPaymentsFromSupabase()" class="text-xs px-2.5 py-1 bg-brownAccent text-white rounded-lg hover:bg-brownHover transition flex items-center gap-1">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button onclick="exitAdminView()" class="text-xs px-2.5 py-1 bg-zinc-900 text-zinc-400 rounded-lg hover:text-white">Exit</button>
+                    </div>
+                </div>
+
+                <!-- Admin Section: Payment Verification Requests -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Incoming Payment Receipts</h4>
+                        <span class="text-[10px] text-emerald-400 flex items-center gap-1">
+                            <i class="fas fa-wifi text-[9px]"></i> Live Sync Active
+                        </span>
+                    </div>
+                    <div id="admin-payments-list" class="space-y-3">
+                        <!-- Populated dynamically via Supabase -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION BAR (FIXED SCREEN BOTTOM) -->
+        <nav id="bottom-nav" class="hidden glass-nav px-2 py-2 flex items-center justify-around z-40">
+            <button onclick="switchBottomTab('dashboard')" id="nav-btn-dashboard" class="nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-brownLight font-medium transition">
+                <i class="fas fa-home text-base mb-1"></i>
+                <span class="text-[10px]">Dashboard</span>
+            </button>
+
+            <button onclick="switchBottomTab('coach')" id="nav-btn-coach" class="nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-zinc-500 hover:text-zinc-300 font-medium transition">
+                <i class="fas fa-robot text-base mb-1"></i>
+                <span class="text-[10px]">AI Coach</span>
+            </button>
+
+            <button onclick="switchBottomTab('sos')" id="nav-btn-sos" class="nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-sosRed font-bold transition">
+                <i class="fas fa-exclamation-triangle text-base mb-1"></i>
+                <span class="text-[10px]">SOS Urge</span>
+            </button>
+
+            <button onclick="switchBottomTab('blocksite')" id="nav-btn-blocksite" class="nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-zinc-500 hover:text-zinc-300 font-medium transition">
+                <i class="fas fa-shield-alt text-base mb-1"></i>
+                <span class="text-[10px]">BlockSite</span>
+            </button>
+
+            <button onclick="switchBottomTab('explore')" id="nav-btn-explore" class="nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-zinc-500 hover:text-zinc-300 font-medium transition">
+                <i class="fas fa-cubes text-base mb-1"></i>
+                <span class="text-[10px]">Explore</span>
+            </button>
+        </nav>
+
+    </div><!-- End Frame Container -->
+
+
+    <!-- MODAL: ADMIN PASSWORD ACCESS -->
+    <div id="modal-admin-pass" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-darkCard border border-darkBorder p-5 rounded-2xl w-full max-w-xs space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                    <i class="fas fa-lock text-brownLight"></i> Admin Access
+                </h3>
+                <button onclick="closeAdminModal()" class="text-zinc-500 hover:text-white text-xs"><i class="fas fa-times"></i></button>
+            </div>
+            <div>
+                <label class="block text-xs text-zinc-400 mb-1">Enter Secret Password</label>
+                <input type="password" id="admin-pass-input" placeholder="Password..." class="w-full bg-zinc-950 border border-darkBorder rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brownAccent">
+            </div>
+            <button onclick="verifyAdminPassword()" class="w-full py-2.5 bg-brownAccent hover:bg-brownHover text-white text-xs font-bold rounded-xl transition">
+                Login to Admin Panel
+            </button>
+        </div>
+    </div>
+
+
+    <!-- MAIN JS APPLICATION ENGINE -->
+    <script>
+        // APPLICATION PERSISTENT STATE
+        let appState = {
+            userId: localStorage.getItem('stop_user_id') || ('user_' + Math.random().toString(36).substr(2, 9)),
+            username: localStorage.getItem('stop_username') || '',
+            targetDays: parseInt(localStorage.getItem('stop_target_days')) || 30,
+            streakStartTime: localStorage.getItem('stop_streak_start') ? parseInt(localStorage.getItem('stop_streak_start')) : null,
+            isPaid: localStorage.getItem('stop_is_paid') === 'true',
+            paymentStatus: localStorage.getItem('stop_payment_status') || 'none', // none, pending, approved, rejected
+            paymentToken: localStorage.getItem('stop_payment_token') || '',
+            paymentMethod: 'ba9chich',
+            trigger: localStorage.getItem('stop_trigger') || 'Boredom',
+            motivation: localStorage.getItem('stop_motivation') || '',
+            blockedDomains: JSON.parse(localStorage.getItem('stop_blocked_domains')) || ['porn.com', 'xvideos.com', 'tiktok.com']
+        };
+
+        localStorage.setItem('stop_user_id', appState.userId);
+
+        let adminPaymentEvents = null;
+
+        // INITIALIZATION ON LOAD
+        window.addEventListener('load', () => {
+            initApp();
+            startCountdownTimer();
+            startStreakTimer();
+            startBreathingCycle();
+            renderBlockedDomains();
+            listenToUserPaymentStatus();
+            simulateNavigateURL(); // Init browser simulator
+        });
+
+        function initApp() {
+            if (appState.isPaid && appState.paymentStatus === 'approved') {
+                showBottomNav(true);
+                switchBottomTab('dashboard');
+                updateDashboardUI();
+            } else if (appState.paymentStatus === 'pending') {
+                showBottomNav(false);
+                showView('view-payment');
+                document.getElementById('payment-status-box').classList.remove('hidden');
+            } else if (appState.username) {
+                showBottomNav(false);
+                showView('view-payment');
+            } else {
+                showBottomNav(false);
+                showView('view-onboarding-1');
+            }
+        }
+
+        // VIEW ROUTER SWITCHER
+        function showView(viewId) {
+            document.querySelectorAll('.view-screen').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(viewId);
+            if (target) target.classList.remove('hidden');
+        }
+
+        function showBottomNav(visible) {
+            const nav = document.getElementById('bottom-nav');
+            if (visible) nav.classList.remove('hidden');
+            else nav.classList.add('hidden');
+        }
+
+        function switchBottomTab(tabName) {
+            showView('view-' + tabName);
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                btn.className = "nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-zinc-500 hover:text-zinc-300 font-medium transition";
+            });
+            const activeBtn = document.getElementById('nav-btn-' + tabName);
+            if (activeBtn) {
+                if (tabName === 'sos') activeBtn.className = "nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-sosRed font-bold transition";
+                else activeBtn.className = "nav-tab-btn flex flex-col items-center py-1.5 px-3 rounded-xl text-brownLight font-medium transition";
+            }
+        }
+
+        // ONBOARDING STEP HANDLERS
+        function selectTargetDays(days, btn) {
+            appState.targetDays = days;
+            document.querySelectorAll('.target-day-btn').forEach(b => {
+                b.className = "target-day-btn py-3 rounded-xl bg-darkCard border border-darkBorder text-zinc-400 hover:text-white font-bold text-xs";
+            });
+            btn.className = "target-day-btn py-3 rounded-xl bg-darkCard border border-brownAccent text-white font-bold text-xs";
+        }
+
+        function goToOnboardingStep2() {
+            const nameInput = document.getElementById('onboard-name').value.trim();
+            if (!nameInput) {
+                triggerTopNotification("NAME REQUIRED", "Please enter your nickname to continue.", "fa-user");
+                return;
+            }
+            appState.username = nameInput;
+            localStorage.setItem('stop_username', nameInput);
+            localStorage.setItem('stop_target_days', appState.targetDays);
+            showView('view-onboarding-2');
+        }
+
+        function selectTrigger(triggerName, btn) {
+            appState.trigger = triggerName;
+            document.querySelectorAll('.trigger-btn').forEach(b => {
+                b.className = "trigger-btn w-full p-3 rounded-xl bg-darkCard border border-darkBorder text-left text-xs text-zinc-300 font-medium flex items-center justify-between";
+                b.querySelector('i.fa-check-circle')?.classList.replace('fa-check-circle', 'fa-circle');
+            });
+            btn.className = "trigger-btn w-full p-3 rounded-xl bg-darkCard border border-brownAccent text-left text-xs text-white font-medium flex items-center justify-between";
+        }
+
+        // VERIFICATION LOADER (0-100%)
+        function startVerificationLoader() {
+            appState.motivation = document.getElementById('onboard-motivation').value.trim();
+            localStorage.setItem('stop_motivation', appState.motivation);
+            localStorage.setItem('stop_trigger', appState.trigger);
+
+            showView('view-loading');
+            let progress = 0;
+            const circle = document.getElementById('loader-circle');
+            const percentText = document.getElementById('loader-percentage');
+            const statusTitle = document.getElementById('loader-status-title');
+            const circum = 264;
+
+            const interval = setInterval(() => {
+                progress += 2;
+                if (progress > 100) progress = 100;
+
+                const offset = circum - (progress / 100) * circum;
+                circle.style.strokeDashoffset = offset;
+                percentText.innerText = progress + "%";
+
+                if (progress === 40) statusTitle.innerText = "Configuring Gemini AI Coach Rules...";
+                if (progress === 75) statusTitle.innerText = "Setting Up Supabase Account Sync...";
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showView('view-payment');
+                    }, 500);
+                }
+            }, 50);
+        }
+
+        // PAYMENT PROOF UPLOAD & SUBACTION
+        function switchPaymentTab(tab) {
+            appState.paymentMethod = tab;
+            document.querySelectorAll('.payment-tab').forEach(t => t.classList.add('hidden'));
+            if (tab === 'ba9chich') {
+                document.getElementById('tab-ba9chich').classList.remove('hidden');
+                document.getElementById('tab-btn-ba9chich').className = "py-2.5 bg-brownAccent text-white font-bold text-xs rounded-xl border border-brownAccent transition shadow";
+                document.getElementById('tab-btn-d17').className = "py-2.5 bg-darkCard text-zinc-400 font-bold text-xs rounded-xl border border-darkBorder hover:text-white transition";
+            } else {
+                document.getElementById('tab-d17').classList.remove('hidden');
+                document.getElementById('tab-btn-d17').className = "py-2.5 bg-brownAccent text-white font-bold text-xs rounded-xl border border-brownAccent transition shadow";
+                document.getElementById('tab-btn-ba9chich').className = "py-2.5 bg-darkCard text-zinc-400 font-bold text-xs rounded-xl border border-darkBorder hover:text-white transition";
+            }
+        }
+
+        function copyD17Card() {
+            navigator.clipboard.writeText('90272020');
+            triggerTopNotification("D17 COPIED", "Card number 90272020 copied to clipboard!", "fa-copy");
+        }
+
+        function previewProofFile(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('proof-preview-name').innerText = file.name;
+                document.getElementById('proof-preview-container').classList.remove('hidden');
+            }
+        }
+
+        function clearProofFile() {
+            document.getElementById('input-payment-proof').value = '';
+            document.getElementById('proof-preview-container').classList.add('hidden');
+        }
+
+        async function submitPaymentProof() {
+            const fileInput = document.getElementById('input-payment-proof');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                triggerTopNotification("RECEIPT REQUIRED", "Please attach a photo or PDF of your payment proof.", "fa-exclamation-circle");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                triggerTopNotification("FILE TOO LARGE", "Please choose a receipt smaller than 5 MB.", "fa-exclamation-circle");
+                return;
+            }
+
+            const submitButton = document.getElementById('btn-submit-payment');
+            submitButton.disabled = true;
+            try {
+                const proofDataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => reject(new Error("Could not read the selected receipt."));
+                    reader.readAsDataURL(file);
+                });
+                if (typeof proofDataUrl !== 'string') throw new Error("Could not read the selected receipt.");
+                const response = await fetch('/api/payments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: appState.userId,
+                        user_name: appState.username || 'Anonymous User',
+                        target_days: appState.targetDays || 30,
+                        payment_method: appState.paymentMethod,
+                        receipt_url: proofDataUrl,
+                        file_name: file.name
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Payment proof could not be submitted.");
+
+                appState.paymentStatus = 'pending';
+                appState.paymentToken = result.status_token;
+                localStorage.setItem('stop_payment_status', 'pending');
+                localStorage.setItem('stop_payment_token', result.status_token);
+
+                document.getElementById('payment-status-box').classList.remove('hidden');
+                triggerTopNotification("PROOF SUBMITTED", "Receipt sent to the admin. You'll be notified after verification.", "fa-clock");
+            } catch (error) {
+                console.error("Payment submission failed:", error);
+                triggerTopNotification("SUBMISSION FAILED", error.message || "Could not send your receipt. Please try again.", "fa-exclamation-circle");
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        // Check payment status so the app unlocks after admin approval.
+        function listenToUserPaymentStatus() {
+            setInterval(async () => {
+                if (appState.paymentStatus !== 'pending' || !appState.paymentToken) return;
+                try {
+                    const response = await fetch(`/api/payments/status/${encodeURIComponent(appState.paymentToken)}`);
+                    if (!response.ok) throw new Error("Payment status check failed.");
+                    const { status } = await response.json();
+                    if (status === 'approved') unlockUserApp();
+                    else if (status === 'rejected') rejectUserPayment();
+                } catch (error) {
+                    console.warn("Could not refresh payment status:", error);
+                }
+            }, 3000);
+        }
+
+        function unlockUserApp() {
+            appState.isPaid = true;
+            appState.paymentStatus = 'approved';
+            if (!appState.streakStartTime) {
+                appState.streakStartTime = Date.now();
+                localStorage.setItem('stop_streak_start', appState.streakStartTime);
+            }
+            localStorage.setItem('stop_is_paid', 'true');
+            localStorage.setItem('stop_payment_status', 'approved');
+
+            triggerTopNotification("PAYMENT CONFIRMED!", "Welcome! Premium recovery features unlocked.", "fa-check-circle");
+            showBottomNav(true);
+            switchBottomTab('dashboard');
+            updateDashboardUI();
+        }
+
+        function rejectUserPayment() {
+            appState.paymentStatus = 'rejected';
+            localStorage.setItem('stop_payment_status', 'rejected');
+            document.getElementById('payment-status-box').classList.add('hidden');
+            triggerTopNotification("PAYMENT REJECTED", "Your proof was invalid. Please re-upload.", "fa-times-circle");
+        }
+
+        // STREAK TIMER TICKER
+        function startStreakTimer() {
+            setInterval(() => {
+                if (!appState.streakStartTime) return;
+                const diff = Date.now() - appState.streakStartTime;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const mins = Math.floor((diff / (1000 * 60)) % 60);
+                const secs = Math.floor((diff / 1000) % 60);
+
+                document.getElementById('streak-days').innerText = String(days).padStart(2, '0');
+                document.getElementById('streak-hours').innerText = String(hours).padStart(2, '0');
+                document.getElementById('streak-mins').innerText = String(mins).padStart(2, '0');
+                document.getElementById('streak-secs').innerText = String(secs).padStart(2, '0');
+
+                // Progress Bar Update
+                const target = appState.targetDays || 30;
+                const percent = Math.min(100, Math.floor((days / target) * 100));
+                document.getElementById('dash-progress-percent').innerText = percent + "%";
+                document.getElementById('dash-progress-bar').style.width = Math.max(2, percent) + "%";
+            }, 1000);
+        }
+
+        function updateDashboardUI() {
+            document.getElementById('dash-target-days').innerText = appState.targetDays;
+        }
+
+        function confirmResetStreak() {
+            if (confirm("Are you sure you had a relapse? Resetting will restart your streak from Day 0.")) {
+                appState.streakStartTime = Date.now();
+                localStorage.setItem('stop_streak_start', appState.streakStartTime);
+                triggerTopNotification("COUNTER RESET", "Streak restarted. Learn from this slip and keep pushing!", "fa-redo");
+            }
+        }
+
+        // GEMINI AI INTEGRATION
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const prompt = input.value.trim();
+            if (!prompt) return;
+
+            appendChatMessage('user', prompt);
+            input.value = '';
+
+            const typingId = appendTypingIndicator();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt,
+                        user_name: appState.username,
+                        target_days: appState.targetDays,
+                        trigger: appState.trigger
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'AI Coach is temporarily unavailable.');
+                removeTypingIndicator(typingId);
+                appendChatMessage('ai', result.reply);
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                appendChatMessage('ai', error.message || 'AI Coach is temporarily unavailable. Please try again.');
+            }
+        }
+
+        function sendQuickPrompt(text) {
+            document.getElementById('chat-input').value = text;
+            sendChatMessage();
+        }
+
+        function handleChatKeyPress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function appendChatMessage(sender, text) {
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = "flex items-start space-x-2.5";
+
+            if (sender === 'user') {
+                div.innerHTML = `
+                    <div class="ml-auto bg-brownAccent text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] text-xs leading-relaxed shadow">
+                        ${escapeHtml(text)}
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="w-7 h-7 rounded-lg bg-brownAccent/20 text-brownLight flex items-center justify-center text-xs flex-shrink-0 mt-0.5 border border-brownAccent/30">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="bg-darkCard border border-darkBorder p-3 rounded-2xl rounded-tl-none max-w-[85%] text-xs text-zinc-200 leading-relaxed">
+                        ${escapeHtml(text)}
+                    </div>
+                `;
+            }
+
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function appendTypingIndicator() {
+            const box = document.getElementById('chat-messages');
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = "flex items-start space-x-2.5";
+            div.innerHTML = `
+                <div class="w-7 h-7 rounded-lg bg-brownAccent/20 text-brownLight flex items-center justify-center text-xs flex-shrink-0 border border-brownAccent/30">
+                    <i class="fas fa-robot fa-spin"></i>
+                </div>
+                <div class="bg-darkCard border border-darkBorder px-3 py-2 rounded-2xl text-xs text-zinc-400 italic">
+                    Gemini AI is writing response...
+                </div>
+            `;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function clearChatHistory() {
+            document.getElementById('chat-messages').innerHTML = '';
+        }
+
+        // SOS 4-7-8 BREATHING CYCLE
+        function startBreathingCycle() {
+            let phase = 0; // 0: inhale, 1: hold, 2: exhale
+            const phaseText = document.getElementById('breath-phase');
+            const timerText = document.getElementById('breath-timer');
+
+            setInterval(() => {
+                if (phase === 0) {
+                    phaseText.innerText = "Inhale";
+                    timerText.innerText = "4s";
+                    phase = 1;
+                } else if (phase === 1) {
+                    phaseText.innerText = "Hold Breath";
+                    timerText.innerText = "7s";
+                    phase = 2;
+                } else {
+                    phaseText.innerText = "Exhale Slow";
+                    timerText.innerText = "8s";
+                    phase = 0;
+                }
+            }, 5000);
+        }
+
+        // BLOCKSITE SIMULATOR ENGINE
+        function renderBlockedDomains() {
+            const list = document.getElementById('blocked-domains-list');
+            list.innerHTML = appState.blockedDomains.map((domain, index) => `
+                <div class="flex items-center justify-between p-2.5 bg-darkCard border border-darkBorder rounded-xl text-xs">
+                    <span class="font-mono text-zinc-300 flex items-center gap-2">
+                        <i class="fas fa-ban text-red-500"></i> ${domain}
+                    </span>
+                    <button onclick="removeBlockedDomain(${index})" class="text-zinc-500 hover:text-red-400 text-xs px-2 py-1">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addBlockedDomain() {
+            const input = document.getElementById('input-block-url');
+            let url = input.value.trim().toLowerCase().replace('https://', '').replace('http://', '').replace('www.', '');
+            if (!url) return;
+            if (!appState.blockedDomains.includes(url)) {
+                appState.blockedDomains.push(url);
+                localStorage.setItem('stop_blocked_domains', JSON.stringify(appState.blockedDomains));
+                renderBlockedDomains();
+                triggerTopNotification("DOMAIN BLOCKED", `${url} added to blacklist!`, "fa-shield-alt");
+            }
+            input.value = '';
+        }
+
+        function removeBlockedDomain(index) {
+            appState.blockedDomains.splice(index, 1);
+            localStorage.setItem('stop_blocked_domains', JSON.stringify(appState.blockedDomains));
+            renderBlockedDomains();
+        }
+
+        function simulateNavigateURL() {
+            const urlBar = document.getElementById('browser-url-bar').value.trim().toLowerCase();
+            const viewport = document.getElementById('browser-viewport');
+            
+            const isBlocked = appState.blockedDomains.some(b => urlBar.includes(b));
+
+            if (isBlocked) {
+                viewport.className = "w-full h-44 bg-red-950/80 border border-red-800 rounded-xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden";
+                viewport.innerHTML = `
+                    <i class="fas fa-shield-virus text-3xl text-red-400 mb-1 animate-bounce"></i>
+                    <h4 class="text-xs font-black text-white uppercase tracking-wider">ACCESS BLOCKED BY STOP</h4>
+                    <p class="text-[10px] text-red-200 mt-0.5">This domain is on your anti-relapse blacklist.</p>
+                    <button onclick="switchBottomTab('sos')" class="mt-2 px-3 py-1 bg-red-800 hover:bg-red-700 text-white font-bold text-[10px] rounded-lg">
+                        Go to SOS Urge Relief
+                    </button>
+                `;
+            } else {
+                viewport.className = "w-full h-44 bg-zinc-950 border border-darkBorder rounded-xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden";
+                viewport.innerHTML = `
+                    <i class="fas fa-globe text-2xl text-emerald-400 mb-1"></i>
+                    <h4 class="text-xs font-bold text-white">Safe Web Page Loaded</h4>
+                    <span class="text-[10px] font-mono text-zinc-500 mt-0.5">${urlBar}</span>
+                `;
+            }
+        }
+
+        // PROMO TIMER COUNTDOWN
+        function startCountdownTimer() {
+            let totalSecs = 23 * 3600 + 59 * 60 + 54;
+            setInterval(() => {
+                totalSecs--;
+                if (totalSecs < 0) totalSecs = 86400;
+                const h = Math.floor(totalSecs / 3600);
+                const m = Math.floor((totalSecs % 3600) / 60);
+                const s = totalSecs % 60;
+                document.getElementById('promo-timer').innerText = 
+                    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        // ADMIN PANEL SUPABASE MANAGEMENT
+        function openAdminModal() {
+            document.getElementById('modal-admin-pass').classList.remove('hidden');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('modal-admin-pass').classList.add('hidden');
+        }
+
+        async function verifyAdminPassword() {
+            const pass = document.getElementById('admin-pass-input').value.trim();
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Admin login failed.");
+
+                document.getElementById('admin-pass-input').value = '';
+                closeAdminModal();
+                showBottomNav(false);
+                showView('view-admin');
+                startAdminPaymentEvents();
+                fetchPaymentsFromSupabase();
+            } catch (error) {
+                console.error("Admin login failed:", error);
+                alert(error.message || "Admin login failed.");
+            }
+        }
+
+        function exitAdminView() {
+            if (adminPaymentEvents) {
+                adminPaymentEvents.close();
+                adminPaymentEvents = null;
+            }
+            fetch('/api/admin/logout', { method: 'POST' }).catch(error => {
+                console.warn("Admin logout request failed:", error);
+            });
+            initApp();
+        }
+
+        function startAdminPaymentEvents() {
+            if (adminPaymentEvents) adminPaymentEvents.close();
+            adminPaymentEvents = new EventSource('/api/admin/payment-events');
+            adminPaymentEvents.addEventListener('payments-changed', fetchPaymentsFromSupabase);
+            adminPaymentEvents.onerror = () => {
+                console.warn("Admin payment notifications disconnected; reconnecting...");
+            };
+        }
+
+        async function fetchPaymentsFromSupabase() {
+            try {
+                const response = await fetch('/api/admin/payments');
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Could not load payments.");
+                renderAdminPayments(result.payments);
+            } catch (error) {
+                console.error("Could not load admin payments:", error);
+                triggerTopNotification("PAYMENTS UNAVAILABLE", error.message || "Could not load payments.", "fa-exclamation-circle");
+            }
+        }
+
+        function renderAdminPayments(payments) {
+            const container = document.getElementById('admin-payments-list');
+            if (!payments || payments.length === 0) {
+                container.innerHTML = `<p class="text-xs text-zinc-500 italic text-center p-4">No payment receipts uploaded yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = payments.map(p => {
+                const name = String(p.user_name || p.username || 'User');
+                const method = escapeHtml(String(p.payment_method || 'Online'));
+                const status = String(p.status || 'pending');
+                const receipt = p.receipt_url || p.proof || '';
+                const fileName = String(p.file_name || p.fileName || '');
+                const date = escapeHtml(p.created_at ? new Date(p.created_at).toLocaleString() : (p.timestamp || 'Just now'));
+                const safeReceipt = /^data:(image\/(?:jpeg|png|webp|gif)|application\/pdf);base64,[A-Za-z0-9+/]+={0,2}$/.test(receipt)
+                    || /^\/api\/admin\/receipts\/[0-9a-f-]{36}\.(?:jpg|png|webp|gif|pdf)$/i.test(receipt)
+                    ? receipt
+                    : '';
+                const isPdf = fileName.toLowerCase().endsWith('.pdf')
+                    || /^data:application\/pdf;/.test(safeReceipt)
+                    || /\.pdf$/i.test(safeReceipt);
+                const paymentId = typeof p.id === 'string' && /^[A-Za-z0-9_-]+$/.test(p.id) ? p.id : '';
+                const safeStatus = escapeHtml(status);
+
+                return `
+                    <div class="bg-darkCard border border-darkBorder p-3.5 rounded-2xl space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <i class="fas fa-user text-brownLight"></i> ${escapeHtml(name)}
+                                </h5>
+                                <span class="text-[10px] text-zinc-400 block mt-0.5">${date} • ${method}</span>
+                            </div>
+                            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded ${status === 'approved' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : status === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${safeStatus}</span>
+                        </div>
+
+                        ${safeReceipt ? `
+                            <div class="mt-2">
+                                <span class="text-[10px] text-zinc-500 font-bold uppercase block mb-1">Receipt Proof:</span>
+                                ${isPdf ? `
+                                    <a href="${safeReceipt}" target="_blank" rel="noopener noreferrer" class="text-xs text-brownLight underline flex items-center gap-1">
+                                        <i class="fas fa-file-pdf"></i> View Attached PDF Receipt (${escapeHtml(fileName)})
+                                    </a>
+                                ` : `
+                                    <a href="${safeReceipt}" target="_blank" rel="noopener noreferrer">
+                                        <img src="${safeReceipt}" class="w-full max-h-44 object-cover rounded-xl border border-zinc-800" alt="Receipt Proof">
+                                    </a>
+                                `}
+                            </div>
+                        ` : ''}
+
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="adminSetPaymentStatus('${paymentId}', 'approved')" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition" ${paymentId ? '' : 'disabled'}>
+                                <i class="fas fa-check mr-1"></i> Confermir (Approve)
+                            </button>
+                            <button onclick="adminSetPaymentStatus('${paymentId}', 'rejected')" class="flex-1 py-2 bg-red-900 hover:bg-red-800 text-white text-xs font-bold rounded-xl transition" ${paymentId ? '' : 'disabled'}>
+                                <i class="fas fa-times mr-1"></i> Rejecter
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function adminSetPaymentStatus(recordId, newStatus) {
+            try {
+                const response = await fetch(`/api/admin/payments/${encodeURIComponent(recordId)}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Could not update payment status.");
+                await fetchPaymentsFromSupabase();
+                triggerTopNotification("ADMIN ACTION", `Payment status updated to ${newStatus.toUpperCase()}`, 'fa-shield-alt');
+            } catch (error) {
+                console.error("Could not update payment:", error);
+                triggerTopNotification("UPDATE FAILED", error.message || "Could not update payment.", "fa-exclamation-circle");
+            }
+        }
+
+        // TOP NOTIFICATION SYSTEM SIMULATOR
+        function triggerTopNotification(title, body, iconClass = 'fa-bell') {
+            document.getElementById('notif-title').innerText = title;
+            document.getElementById('notif-body').innerText = body;
+            document.getElementById('notif-icon').className = `fas ${iconClass}`;
+            
+            const banner = document.getElementById('top-notification-banner');
+            banner.classList.remove('hidden');
+
+            setTimeout(() => {
+                closeNotificationBanner();
+            }, 5000);
+        }
+
+        function triggerTestNotification() {
+            const quotes = [
+                "Your future self will thank you for standing strong right now.",
+                "Urges are temporary, but pride in self-control lasts forever.",
+                "Take 5 deep breaths. Re-center your energy."
+            ];
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            triggerTopNotification("DAILY REINFORCEMENT", randomQuote, "fa-shield-cat");
+        }
+
+        function closeNotificationBanner() {
+            document.getElementById('top-notification-banner').classList.add('hidden');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
